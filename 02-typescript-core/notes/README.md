@@ -1,6 +1,6 @@
 # Stage 02: TypeScript 核心
 
-> **前置要求**: [Stage 01: JavaScript 基础](../01-javascript-foundations/)
+> **前置要求**: [Stage 01: JavaScript 基础](../../01-javascript-foundations/notes/)
 > **预计时间**: 3–5 天
 
 ---
@@ -352,4 +352,4 @@ type Handler = `on${Capitalize<EventName>}`; // "onClick" | "onScroll"
 
 ## 下一步
 
-→ [Stage 03: TypeScript 高级](../03-typescript-advanced/)
+→ [Stage 03: TypeScript 高级](../../03-typescript-advanced/notes/)

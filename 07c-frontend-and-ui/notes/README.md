@@ -1,6 +1,6 @@
 # Stage 07c: 前端与 UI
 
-> **前置要求**: [Stage 02: TypeScript 核心](../02-typescript-core/), [Stage 04: 异步编程](../04-async-programming/)
+> **前置要求**: [Stage 02: TypeScript 核心](../../02-typescript-core/notes/), [Stage 04: 异步编程](../../04-async-programming/notes/)
 > **预计时间**: 4–5 天
 
 ---
@@ -351,6 +351,6 @@ function ProgressTracker() {
 ## 下一步
 
 → 继续其他 Stage 07 模块：
-- [Stage 07a: Schema 与数据层](../07a-schema-and-data/)
-- [Stage 07b: 服务端与 CLI](../07b-server-and-cli/)
-- [Stage 07d: 测试与工具链](../07d-testing-and-tooling/)
+- [Stage 07a: Schema 与数据层](../../07a-schema-and-data/notes/)
+- [Stage 07b: 服务端与 CLI](../../07b-server-and-cli/notes/)
+- [Stage 07d: 测试与工具链](../../07d-testing-and-tooling/notes/)

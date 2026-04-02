@@ -1,6 +1,6 @@
 # Stage 03: TypeScript 高级类型
 
-> **前置要求**: [Stage 02: TypeScript 核心](../02-typescript-core/)
+> **前置要求**: [Stage 02: TypeScript 核心](../../02-typescript-core/notes/)
 > **预计时间**: 4–6 天
 > **难度**: ⭐⭐⭐⭐
 
@@ -321,4 +321,4 @@ type Flat = DeepFlatten<number[][][]>;  // number
 
 ## 下一步
 
-→ [Stage 04: 异步编程](../04-async-programming/)
+→ [Stage 04: 异步编程](../../04-async-programming/notes/)

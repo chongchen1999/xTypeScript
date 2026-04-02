@@ -1,6 +1,6 @@
 # Stage 04: 异步编程 (Async Programming)
 
-> **前置要求**: [Stage 01: JavaScript 基础](../01-javascript-foundations/), [Stage 02: TypeScript 核心](../02-typescript-core/)
+> **前置要求**: [Stage 01: JavaScript 基础](../../01-javascript-foundations/notes/), [Stage 02: TypeScript 核心](../../02-typescript-core/notes/)
 > **预计时间**: 3–4 天
 
 ---
@@ -273,4 +273,4 @@ await fetch(url, { signal: AbortSignal.any([ctrl.signal, AbortSignal.timeout(100
 
 ## 下一步
 
-→ [Stage 05: 运行时与生态系统](../05-runtime-and-ecosystem/)
+→ [Stage 05: 运行时与生态系统](../../05-runtime-and-ecosystem/notes/)

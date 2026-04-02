@@ -16,55 +16,20 @@ JS 基础    TS 核心    TS 进阶    异步编程   运行时生态
           Effect     Schema/数据  Server/CLI  前端/测试
 ```
 
-完整路线图及各阶段说明见 [`notes/README.md`](notes/README.md)。
+| 阶段 | 标题                  | 预计时间   | 前置要求            |
+|------|-----------------------|-----------|---------------------|
+| 01   | JavaScript 基础       | 3–5 天    | C++/Python 经验     |
+| 02   | TypeScript 核心       | 3–5 天    | Stage 01            |
+| 03   | TypeScript 高级       | 4–6 天    | Stage 02            |
+| 04   | 异步编程              | 3–4 天    | Stage 01, 02        |
+| 05   | 运行时与生态系统       | 2–3 天    | Stage 01            |
+| 06   | Effect 框架           | 7–10 天   | Stage 03, 04        |
+| 07a  | Schema 与数据层       | 2–3 天    | Stage 02, 06        |
+| 07b  | 服务端与 CLI          | 3–4 天    | Stage 04, 06        |
+| 07c  | 前端与 UI             | 4–5 天    | Stage 02, 04        |
+| 07d  | 测试与工具链          | 2–3 天    | Stage 05            |
 
----
-
-## 目录结构
-
-```
-xTypeScript/
-├── notes/                    # 各 Stage 深度讲义
-│   ├── README.md             # 总索引与学习路线图
-│   ├── 01-javascript-foundations/README.md
-│   ├── 02-typescript-core/README.md
-│   ├── 03-typescript-advanced/README.md
-│   ├── 04-async-programming/README.md
-│   ├── 05-runtime-and-ecosystem/README.md
-│   ├── 06-effect-framework/README.md
-│   ├── 07a-schema-and-data/README.md
-│   ├── 07b-server-and-cli/README.md
-│   ├── 07c-frontend-and-ui/README.md
-│   └── 07d-testing-and-tooling/README.md
-│
-├── examples/                 # 可直接运行的示例代码（bun run <file>）
-│   ├── 01-javascript-foundations/
-│   ├── 02-typescript-core/
-│   ├── 03-typescript-advanced/
-│   ├── 04-async-programming/
-│   ├── 05-runtime-and-ecosystem/
-│   ├── 06-effect-framework/
-│   └── 07b-server-and-cli/
-│
-├── exercises/                # 习题（TODO 形式）+ 参考答案（.solution.ts）
-│   ├── 01-javascript-foundations/
-│   ├── 02-typescript-core/
-│   ├── 03-typescript-advanced/
-│   ├── 04-async-programming/
-│   └── 06-effect-framework/
-│
-├── projects/                 # 阶段性综合实战项目
-│   ├── 01-cli-todo/          # Bun + Yargs CLI 工具
-│   ├── 02-effect-api/        # Effect + Hono + Drizzle REST API
-│   └── 03-fullstack-app/     # SolidJS + Hono + SQLite 全栈应用
-│
-└── templates/                # 可直接 cp 使用的脚手架
-    ├── bun-ts-starter/       # 最小化 Bun + TypeScript 项目
-    ├── hono-api/             # Hono + Effect + Zod API 服务
-    └── solidjs-app/          # SolidJS + TanStack Router 前端
-```
-
----
+**总计：约 33–48 天**
 
 ## 快速上手
 
@@ -76,19 +41,19 @@ xTypeScript/
 
 ```bash
 # 克隆后直接运行任意示例，无需 npm install
-bun examples/01-javascript-foundations/01-closures.ts
-bun examples/06-effect-framework/03-concurrency.ts
-bun examples/07b-server-and-cli/01-hono-server.ts
+bun 01-javascript-foundations/examples/01-closures-and-this.ts
+bun 06-effect-framework/examples/03-concurrency.ts
+bun 07b-server-and-cli/examples/01-hono-server.ts
 ```
 
 ### 做习题
 
 ```bash
 # 打开习题文件，在 TODO 处填写实现
-bun exercises/03-typescript-advanced/01-type-utilities.ts
+bun 03-typescript-advanced/exercises/01-type-utilities.ts
 
 # 对照答案
-bun exercises/03-typescript-advanced/01-type-utilities.solution.ts
+bun 03-typescript-advanced/exercises/01-type-utilities.solution.ts
 ```
 
 ### 启动实战项目
@@ -116,23 +81,29 @@ cp -r templates/solidjs-app     ~/my-app       && cd ~/my-app    && bun install
 
 ---
 
-## 各模块速览
+## 项目结构
 
-### notes/ — 深度讲义
+每个学习模块按 `XX-模块名/` 组织，内部包含：
 
-每个 Stage 的 `README.md` 包含：
-- 底层原理（V8 引擎、TS 类型系统工作方式）
-- C++ / Python 对比，解释设计决策
-- 常见陷阱与修正示例
-- 关键要点总结
+```
+XX-模块名/
+├── notes/README.md     — 深度讲义（原理、C++/Python 对比、陷阱）
+├── examples/*.ts       — 可运行示例（独立文件，bun 直接执行）
+└── exercises/*.ts      — 习题（含 .solution.ts 参考答案）
+```
 
-### examples/ — 可运行示例
-
-按知识点拆分的独立 `.ts` 文件，注释只保留关键说明。`07c-frontend-and-ui` 不含 examples（浏览器环境）。
-
-### exercises/ — 习题
-
-每道题一个 `.ts` 文件（`// TODO` 注释），配同名 `.solution.ts` 参考答案。难度从基础工具函数到 Effect 服务架构。
+| 模块 | notes | examples | exercises |
+|------|-------|----------|-----------|
+| [01-javascript-foundations](01-javascript-foundations/) | ✅ | 4 files | 6 files |
+| [02-typescript-core](02-typescript-core/) | ✅ | 3 files | 6 files |
+| [03-typescript-advanced](03-typescript-advanced/) | ✅ | 3 files | 6 files |
+| [04-async-programming](04-async-programming/) | ✅ | 3 files | 6 files |
+| [05-runtime-and-ecosystem](05-runtime-and-ecosystem/) | ✅ | 3 files | — |
+| [06-effect-framework](06-effect-framework/) | ✅ | 3 files | 6 files |
+| [07a-schema-and-data](07a-schema-and-data/) | ✅ | — | — |
+| [07b-server-and-cli](07b-server-and-cli/) | ✅ | 3 files | — |
+| [07c-frontend-and-ui](07c-frontend-and-ui/) | ✅ | — | — |
+| [07d-testing-and-tooling](07d-testing-and-tooling/) | ✅ | — | — |
 
 ### projects/ — 综合项目
 
@@ -150,13 +121,13 @@ cp -r templates/solidjs-app     ~/my-app       && cd ~/my-app    && bun install
 
 ## 推荐学习顺序
 
-1. 阅读 `notes/01` → 跑 `examples/01` → 做 `exercises/01`
-2. 阅读 `notes/02` → 跑 `examples/02` → 做 `exercises/02`
-3. 阅读 `notes/03` → 做 `exercises/03`（类型体操重点）
-4. 阅读 `notes/04` → 跑 `examples/04` → 做 `exercises/04`
-5. 阅读 `notes/05` → 跑 `examples/05`
+1. `01-javascript-foundations/` — 阅读 notes → 跑 examples → 做 exercises
+2. `02-typescript-core/` — 阅读 notes → 跑 examples → 做 exercises
+3. `03-typescript-advanced/` — 阅读 notes → 做 exercises（类型体操重点）
+4. `04-async-programming/` — 阅读 notes → 跑 examples → 做 exercises
+5. `05-runtime-and-ecosystem/` — 阅读 notes → 跑 examples
 6. **实战**：完成 `projects/01-cli-todo`
-7. 阅读 `notes/06` → 跑 `examples/06` → 做 `exercises/06`
+7. `06-effect-framework/` — 阅读 notes → 跑 examples → 做 exercises
 8. **实战**：完成 `projects/02-effect-api`
-9. 阅读 `notes/07a–07d` → 跑 `examples/07b`
+9. `07a–07d` — 阅读 notes → 跑 `07b/examples`
 10. **实战**：完成 `projects/03-fullstack-app`

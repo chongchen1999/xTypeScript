@@ -1,6 +1,6 @@
 # Stage 07a: Schema 与数据层
 
-> **前置要求**: [Stage 02: TypeScript 核心](../02-typescript-core/), [Stage 06: Effect 框架](../06-effect-framework/)
+> **前置要求**: [Stage 02: TypeScript 核心](../../02-typescript-core/notes/), [Stage 06: Effect 框架](../../06-effect-framework/notes/)
 > **预计时间**: 2–3 天
 
 ---
@@ -261,6 +261,6 @@ type UserResponse = z.infer<typeof UserResponseSchema>;
 ## 下一步
 
 → 继续其他 Stage 07 模块：
-- [Stage 07b: 服务端与 CLI](../07b-server-and-cli/)
-- [Stage 07c: 前端与 UI](../07c-frontend-and-ui/)
-- [Stage 07d: 测试与工具链](../07d-testing-and-tooling/)
+- [Stage 07b: 服务端与 CLI](../../07b-server-and-cli/notes/)
+- [Stage 07c: 前端与 UI](../../07c-frontend-and-ui/notes/)
+- [Stage 07d: 测试与工具链](../../07d-testing-and-tooling/notes/)

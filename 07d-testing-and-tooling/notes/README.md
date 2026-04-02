@@ -1,6 +1,6 @@
 # Stage 07d: 测试与工具链
 
-> **前置要求**: [Stage 05: 运行时与生态系统](../05-runtime-and-ecosystem/)
+> **前置要求**: [Stage 05: 运行时与生态系统](../../05-runtime-and-ecosystem/notes/)
 > **预计时间**: 2–3 天
 
 ---
@@ -293,4 +293,4 @@ const fns = await parseAndExtractFunctions(`
 
 恭喜！你已完成 TypeScript 学习路线图的所有阶段。
 
-← [返回总索引](../README.md)
+← [返回总索引](../../README.md)

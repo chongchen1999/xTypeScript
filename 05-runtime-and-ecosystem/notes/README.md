@@ -1,6 +1,6 @@
 # Stage 05: 运行时与生态系统 (Runtime & Ecosystem)
 
-> **前置要求**: [Stage 01: JavaScript 基础](../01-javascript-foundations/)
+> **前置要求**: [Stage 01: JavaScript 基础](../../01-javascript-foundations/notes/)
 > **预计时间**: 2–3 天
 
 ---
@@ -267,4 +267,4 @@ import { db } from "@/config/database.ts";
 
 ## 下一步
 
-→ [Stage 06: Effect 框架](../06-effect-framework/)
+→ [Stage 06: Effect 框架](../../06-effect-framework/notes/)

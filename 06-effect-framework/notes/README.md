@@ -1,6 +1,6 @@
 # Stage 06: Effect 框架
 
-> **前置要求**: [Stage 03: TypeScript 高级](../03-typescript-advanced/), [Stage 04: 异步编程](../04-async-programming/)
+> **前置要求**: [Stage 03: TypeScript 高级](../../03-typescript-advanced/notes/), [Stage 04: 异步编程](../../04-async-programming/notes/)
 > **预计时间**: 7–10 天
 > **难度**: ⭐⭐⭐⭐⭐ — 整个路线中最核心的阶段
 
@@ -436,7 +436,7 @@ const makeApiClient = Effect.gen(function* () {
 ## 下一步
 
 → **Stage 07**（选择感兴趣的方向）：
-- [Stage 07a: Schema 与数据层](../07a-schema-and-data/)
-- [Stage 07b: 服务端与 CLI](../07b-server-and-cli/)
-- [Stage 07c: 前端与 UI](../07c-frontend-and-ui/)
-- [Stage 07d: 测试与工具链](../07d-testing-and-tooling/)
+- [Stage 07a: Schema 与数据层](../../07a-schema-and-data/notes/)
+- [Stage 07b: 服务端与 CLI](../../07b-server-and-cli/notes/)
+- [Stage 07c: 前端与 UI](../../07c-frontend-and-ui/notes/)
+- [Stage 07d: 测试与工具链](../../07d-testing-and-tooling/notes/)

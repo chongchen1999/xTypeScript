@@ -438,4 +438,4 @@ const { PI, square } = require("./math");
 
 ## 下一步
 
-→ [Stage 02: TypeScript 核心](../02-typescript-core/)
+→ [Stage 02: TypeScript 核心](../../02-typescript-core/notes/)
