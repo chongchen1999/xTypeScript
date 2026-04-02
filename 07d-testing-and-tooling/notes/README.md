@@ -70,7 +70,43 @@ describe("fetchPosts", () => {
 });
 ```
 
-### 1.3 测试 Effect 代码
+### 1.3 覆盖率配置 (Coverage Configuration)
+
+Vitest 内置 `v8`（快速，基于 V8 引擎）和 `istanbul`（更精确）两种 coverage provider：
+
+```typescript
+// vitest.config.ts
+import { defineConfig } from "vitest/config";
+
+export default defineConfig({
+  test: {
+    coverage: {
+      provider: "v8",                          // "v8" (fast) or "istanbul" (precise)
+      reporter: ["text", "html", "lcov"],      // terminal + browser + CI integration
+      include: ["src/**/*.ts"],                // only measure app code
+      exclude: ["**/*.test.ts", "**/*.d.ts"],  // skip tests and declarations
+      thresholds: {
+        branches: 80,
+        functions: 80,
+        lines: 80,
+        statements: 80,
+      },
+    },
+  },
+});
+```
+
+```bash
+vitest run --coverage              # generate report
+vitest --coverage --watch          # watch mode with live coverage
+```
+
+**⚠️ 常见陷阱**：
+- `v8` provider 对 async 代码可能少报分支覆盖；切换 `istanbul` 更准确
+- 100% 覆盖率不等于无 bug — 关注 branch coverage 比 line coverage 更有价值
+- 覆盖率文件（`coverage/`）应加入 `.gitignore`
+
+### 1.4 测试 Effect 代码
 
 用 `Layer` 注入测试依赖，用 `Effect.flip` 验证错误路径。
 
@@ -328,6 +364,32 @@ tree = parser.parse(newSourceCode, tree);
 ```
 
 **实际应用场景**: IDE 语法高亮、代码折叠、symbol outline、自动 rename、lint 规则
+
+---
+
+## ⚠️ 常见陷阱
+
+### Vitest
+
+1. **Mock 泄漏**: `vi.spyOn()` / `vi.fn()` 在测试间共享状态。忘记 `vi.restoreAllMocks()` 或 `afterEach(() => vi.restoreAllMocks())` 会导致测试间污染。
+
+2. **Snapshot 脆弱性**: `toMatchSnapshot()` 对比整个对象/字符串——包含时间戳、随机 ID 的输出会导致 snapshot 每次都不同。用 `expect.any(String)` 或 `toMatchInlineSnapshot` 精确匹配关键字段。
+
+3. **异步测试忘记 `await`**: `it("...", async () => { expect(fn()).resolves.toBe(...) })` — 若不 `await expect(...)`，Promise rejection 会被吞掉，测试假通过。
+
+### Playwright
+
+4. **隐式等待假设**: Playwright auto-waits for elements，但不等待 **client-side navigation**。SPA 中页面跳转后需 `await page.waitForURL("/target")` 而非假设立即可见。
+
+5. **Network interception 顺序**: `page.route()` 按注册顺序匹配。宽泛的通配符 `**/*` 会拦截所有请求，包括资源文件。
+
+### Turborepo
+
+6. **缓存失效**: 修改了环境变量但忘记在 `turbo.json` 的 `globalEnv` 中声明——Turborepo 用了旧缓存的构建产物。`.env` 文件变化也需要配置 `globalDotEnv`。
+
+### Remeda
+
+7. **Data-first vs data-last**: `R.filter(arr, fn)` (data-first) 和 `R.filter(fn)` (data-last, for pipe) 是不同的重载。在 `R.pipe()` 中误用 data-first 会产生类型错误。
 
 ---
 

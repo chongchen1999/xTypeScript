@@ -418,6 +418,37 @@ function ProgressTracker() {
 
 ---
 
+## ⚠️ 常见陷阱
+
+### SolidJS
+
+1. **Props 解构**: 最常见的错误。`const { name } = props` 在组件创建时取值一次，之后永远不更新。始终用 `props.name` 或 `splitProps()`。
+
+2. **`createEffect` 中的异步**: `createEffect` 只追踪**同步执行**期间读取的 signal。`await` 之后读取的 signal 不会被追踪：
+   ```tsx
+   createEffect(async () => {
+     console.log(count());    // ✅ tracked
+     await fetch("/api");
+     console.log(other());    // ❌ NOT tracked — after await
+   });
+   ```
+
+3. **`<For>` vs `.map()`**: `<For>` 根据引用追踪列表项变化，高效更新单个 DOM 节点。直接用 `.map()` 会在每次更新时重建所有节点。
+
+4. **`createResource` 的 undefined 初始值**: 首次渲染时 `resource()` 返回 `undefined`，必须配合 `<Show>` 或 `<Suspense>` 使用。
+
+### TanStack
+
+5. **Query key 稳定性**: `queryKey` 中的对象引用变化会触发 refetch。用 `() => ({ queryKey: [...] })` 确保 signal 响应式求值。
+
+6. **Mutation 后忘记 invalidate**: `createMutation` 成功后不会自动更新缓存——必须在 `onSuccess` 中手动 `queryClient.invalidateQueries()`。
+
+### Tauri
+
+7. **`invoke` 返回 `any`**: IPC 调用的返回类型默认是 `any`。务必用泛型指定：`invoke<FileStats>("analyze_file", { path })`。
+
+---
+
 ## 推荐资源
 
 | 资源 | 链接 |

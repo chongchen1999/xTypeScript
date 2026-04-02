@@ -332,6 +332,33 @@ type UserResponse = z.infer<typeof UserResponseSchema>;
 
 ---
 
+## ⚠️ 常见陷阱
+
+### Zod
+
+1. **`z.infer` vs `z.input` vs `z.output`**: 有 `.transform()` 时三者不同。`z.infer` = `z.output`（转换后），`z.input`（转换前）。API 请求类型用 `z.input`，处理后类型用 `z.output`。
+
+2. **`.optional()` vs `.nullable()` vs `.nullish()`**:
+   ```typescript
+   z.string().optional()   // string | undefined
+   z.string().nullable()   // string | null
+   z.string().nullish()    // string | null | undefined
+   ```
+
+3. **Error message 丢失**: `.refine()` 返回 `false` 时若不指定 `message`，用户看到的是泛用的 "Invalid input"——务必提供有意义的错误信息。
+
+4. **Schema 复用陷阱**: `.extend()` 只能用于 `z.object()`；对带 `.transform()` 的 schema 用 `.extend()` 会丢失 transform。用 `.pipe()` 串联代替。
+
+### Drizzle
+
+1. **SQLite 类型映射**：`integer({ mode: "boolean" })` 存储为 `0/1`，直接 raw query 会看到数字而非 `true/false`。
+
+2. **`.returning()` 支持**: SQLite 支持 `RETURNING`（3.35.0+），但 MySQL 不支持——Drizzle 会静默忽略，导致 insert 返回 `undefined`。
+
+3. **关系查询 vs SQL 查询**: `db.query.users.findMany({ with: { posts: true } })` 使用 relational API（需定义 `relations()`）；`db.select().from(users)` 使用 SQL-like API——两者不能混用 `.where()` 语法。
+
+---
+
 ## 推荐资源
 
 - [Zod 官方文档](https://zod.dev) — 完整 API 参考

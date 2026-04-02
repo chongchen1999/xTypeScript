@@ -19,6 +19,30 @@
 
 JavaScript 是单线程的，通过 event loop 实现并发。执行优先级：**Call Stack > Microtask Queue > Task Queue**。每次 call stack 清空后，engine 先清空所有 microtasks，再取一个 macrotask。
 
+```
+┌──────────────────────────────────────────────────┐
+│                   Event Loop                     │
+│                                                  │
+│  ┌────────────┐    每帧循环:                      │
+│  │ Call Stack  │    1. 执行 call stack 直到清空     │
+│  │ (sync code) │    2. 清空所有 microtasks          │
+│  └─────┬──────┘    3. 取一个 macrotask → call stack │
+│        │           4. (浏览器) 渲染 UI               │
+│        ▼           5. 重复                          │
+│  ┌────────────┐                                    │
+│  │ Microtask  │  Promise.then, queueMicrotask      │
+│  │   Queue    │  MutationObserver                  │
+│  │ (高优先级)  │  ⚠️ 全部清空后才处理 macrotask       │
+│  └─────┬──────┘                                    │
+│        ▼                                           │
+│  ┌────────────┐                                    │
+│  │ Macrotask  │  setTimeout, setInterval           │
+│  │   Queue    │  I/O callbacks, MessageChannel     │
+│  │ (低优先级)  │  每次只取一个                       │
+│  └────────────┘                                    │
+└──────────────────────────────────────────────────┘
+```
+
 | 特性 | TypeScript/JS | Python | C++ |
 |------|--------------|--------|-----|
 | 并发模型 | Single-threaded event loop | `asyncio` event loop | `std::async` (multi-threaded) |
@@ -31,6 +55,14 @@ Promise.resolve().then(() => console.log("3: microtask"));
 queueMicrotask(() => console.log("4: microtask"));
 console.log("5: sync");
 // Output: 1 -> 5 -> 3 -> 4 -> 2
+```
+
+**⚠️ Microtask 饥饿陷阱**: 如果 microtask 中又产生新的 microtask，它们会在同一轮全部清空——可以阻塞 macrotask 和 UI 渲染：
+
+```typescript
+// BAD: infinite microtask loop — macrotasks and rendering are starved
+function loop() { Promise.resolve().then(loop); }
+loop(); // setTimeout callbacks will NEVER execute
 ```
 
 ---

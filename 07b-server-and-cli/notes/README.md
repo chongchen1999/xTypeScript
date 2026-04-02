@@ -388,6 +388,30 @@ server.prompt(
 
 ---
 
+## ⚠️ 常见陷阱
+
+### Hono
+
+1. **中间件顺序**: 中间件按注册顺序执行。`app.use("*", auth)` 必须在路由定义之前，否则路由不受保护。
+
+2. **`c.req.json()` 只能调用一次**: Request body 是 stream，第二次调用返回空。用 `zValidator` 代替手动 parse。
+
+3. **`c.json()` 类型推导**: Hono 会根据 `c.json(data, status)` 推导响应类型。若漏掉 status 参数，客户端类型可能不匹配。
+
+### Yargs
+
+4. **`hideBin(process.argv)` 必须调用**: 不调用会把 `node` 和脚本路径当成参数解析。Bun 中同理。
+
+5. **`choices` + `as const`**: 不加 `as const` 则 `argv.template` 类型是 `string` 而非 `"basic" | "full"` 字面量。
+
+### MCP
+
+6. **Tool 幂等性**: LLM 可能重复调用同一 tool——确保有副作用的 tool（写文件、发请求）做幂等处理或有确认机制。
+
+7. **Schema 描述**: `z.string().describe("...")` 的 description 直接展示给 LLM，是 tool 能否被正确调用的关键——描述要精确、具体。
+
+---
+
 ## 推荐资源
 
 | 资源 | 链接 |
