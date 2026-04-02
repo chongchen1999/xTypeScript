@@ -1,0 +1,24 @@
+{
+  "name": "@fullstack/client",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev":     "vite",
+    "build":   "tsc --noEmit && vite build",
+    "preview": "vite preview",
+    "check":   "tsc --noEmit"
+  },
+  "dependencies": {
+    "@fullstack/shared":     "workspace:*",
+    "@solidjs/router":       "^0.14.0",
+    "@tanstack/solid-query": "^5.56.0",
+    "@tanstack/query-core":  "^5.56.0",
+    "solid-js":              "^1.9.0"
+  },
+  "devDependencies": {
+    "typescript":        "^5.4.5",
+    "vite":              "^5.4.0",
+    "vite-plugin-solid": "^2.10.0"
+  }
+}

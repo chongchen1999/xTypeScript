@@ -1,0 +1,40 @@
+# Dependencies
+node_modules/
+
+# Build output
+dist/
+.output/
+
+# Databases
+*.db
+*.db-journal
+*.sqlite
+*.sqlite-journal
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# Bun lockfile (commit bun.lockb, not this)
+# bun.lockb is binary — keep it, but ignore npm/yarn equivalents
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+
+# Editor
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Test artifacts
+.tmp-test/
+coverage/
+
+# TypeScript incremental build info
+*.tsbuildinfo

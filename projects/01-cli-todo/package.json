@@ -1,0 +1,21 @@
+{
+  "name": "cli-todo",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "bin": {
+    "todo": "./src/main.ts"
+  },
+  "scripts": {
+    "start": "bun src/main.ts",
+    "test":  "bun test",
+    "check": "tsc --noEmit"
+  },
+  "dependencies": {
+    "yargs": "^17.7.2"
+  },
+  "devDependencies": {
+    "@types/yargs": "^17.0.33",
+    "typescript":   "^5.4.5"
+  }
+}
