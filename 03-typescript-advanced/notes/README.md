@@ -27,18 +27,43 @@ type A = IsString<"hello">;  // true
 type B = IsString<42>;       // false
 ```
 
-### 分布式条件类型
+### 分布式条件类型 (Distributive Conditional Types)
 
-裸类型参数传入联合类型时，自动分布到每个成员：
+当条件类型作用于**裸类型参数**（未被包裹的 `T`），联合类型会自动分布到每个成员上逐一求值，再合并结果。
+C++ 无对应概念——`std::conditional` 不会自动拆分 variant。
 
 ```typescript
+// T is "naked" — distribution happens
 type ToArray<T> = T extends any ? T[] : never;
-type Result = ToArray<string | number>;  // string[] | number[]
-
-// Prevent distribution by wrapping in tuple
-type ToArrayNonDist<T> = [T] extends [any] ? T[] : never;
-type Result2 = ToArrayNonDist<string | number>;  // (string | number)[]
+type Result = ToArray<string | number>;
+//   = (string extends any ? string[] : never) | (number extends any ? number[] : never)
+//   = string[] | number[]
 ```
+
+**分布触发条件**：`T extends U ? X : Y` 中 `T` 必须是裸类型参数（直接使用，未被 `[]`、`{}` 等包裹）。
+
+```typescript
+// ✅ Distributed — T is naked
+type IsString<T> = T extends string ? true : false;
+type R1 = IsString<string | number>;  // true | false  (= boolean)
+
+// ❌ NOT distributed — T is wrapped in tuple
+type IsStringNonDist<T> = [T] extends [string] ? true : false;
+type R2 = IsStringNonDist<string | number>;  // false  (union as a whole doesn't extend string)
+```
+
+**⚠️ 常见陷阱**：分布式行为导致 `never` 消失。`never` 是空联合，分布后无成员可求值，结果仍为 `never`：
+
+```typescript
+type Example<T> = T extends string ? "yes" : "no";
+type R3 = Example<never>;  // never (not "yes" or "no"!)
+
+// Fix: wrap to prevent distribution
+type ExampleSafe<T> = [T] extends [string] ? "yes" : "no";
+type R4 = ExampleSafe<never>;  // "yes" (never extends string)
+```
+
+**实际应用**：利用分布式行为实现 `Extract` / `Exclude`，或防止分布以处理联合类型整体。
 
 ### 重新实现 Extract / Exclude
 

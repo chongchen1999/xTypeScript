@@ -124,6 +124,27 @@ async function withTimeout<T>(promise: Promise<T>, ms: number): Promise<T> {
 
 **Top-level await**: ES2022 起可在 ES modules 中直接使用（需 `"module": "es2022"+`）。
 
+### ⚠️ Unhandled Rejection
+
+Promise reject 后若无 `.catch()` 或 `try/catch`，会触发 `unhandledrejection` 事件。Node/Bun 默认打印警告并可能终止进程。
+
+```typescript
+// BAD: rejection silently lost
+async function riskyOp() { throw new Error("boom"); }
+riskyOp(); // no await, no catch — unhandled rejection!
+
+// GOOD: always handle or propagate
+riskyOp().catch(console.error);
+
+// Global safety net (logging, not recovery)
+process.on("unhandledRejection", (reason, promise) => {
+  console.error("Unhandled rejection at:", promise, "reason:", reason);
+});
+```
+
+**C++ 对比**: `std::future` 析构时若有未获取的异常会调用 `std::terminate`。JS 更宽容但同样危险。
+**Python 对比**: `asyncio` 在 loop 关闭时报告未处理的 exception，行为类似。
+
 ---
 
 ## 4. 生成器与异步生成器 (Generators & Async Generators)
@@ -211,6 +232,68 @@ await response.body!
     },
   }));
 ```
+
+---
+
+## 5.1 错误传播 (Error Propagation in Streams & Async Generators)
+
+### Async Generator 中的错误
+
+`for await...of` 会自动传播 generator 内部的异常。调用 `.throw()` 可向 generator 注入错误：
+
+```typescript
+async function* fetchPages(urls: string[]): AsyncGenerator<string> {
+  for (const url of urls) {
+    const res = await fetch(url);
+    if (!res.ok) throw new Error(`HTTP ${res.status} for ${url}`);
+    yield await res.text();
+  }
+}
+
+// Consumer: error propagates naturally
+try {
+  for await (const page of fetchPages(["/ok", "/404", "/ok"])) {
+    console.log(page.length);
+  }
+} catch (e) {
+  console.error("Stream failed:", e); // HTTP 404 for /404
+}
+
+// Generator cleanup: finally block runs on .return() or .throw()
+async function* withCleanup() {
+  try {
+    yield 1;
+    yield 2;
+  } finally {
+    console.log("cleanup"); // runs when consumer breaks or throws
+  }
+}
+```
+
+### Stream 中的错误
+
+WritableStream 的 `abort()` 和 ReadableStream 的 `cancel()` 触发错误传播。TransformStream 中抛出的错误会终止整个管道：
+
+```typescript
+const transform = new TransformStream<string, number>({
+  transform(chunk, controller) {
+    const n = Number(chunk);
+    if (Number.isNaN(n)) {
+      controller.error(new Error(`Invalid number: ${chunk}`));
+      return; // pipeline aborts here
+    }
+    controller.enqueue(n);
+  },
+});
+
+// pipeTo propagates errors from any stage
+await readable
+  .pipeThrough(transform)
+  .pipeTo(writable)
+  .catch((e) => console.error("Pipeline error:", e));
+```
+
+**⚠️ 常见陷阱**: `pipeThrough()` 不会自动 catch — 如果 TransformStream 抛出错误而 `pipeTo()` 的 Promise 未被 catch，会产生 unhandled rejection。
 
 ---
 

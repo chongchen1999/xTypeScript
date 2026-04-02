@@ -229,8 +229,21 @@ const customers = R.pipe(orders, R.map((o) => o.customer), R.unique());
 
 ## 6. Tree-sitter: 语法解析
 
-Tree-sitter 是增量解析器框架，将源码解析为具体语法树 (CST)。
+Tree-sitter 是增量解析器框架，将源码解析为**具体语法树 (CST)**。
 通过 `web-tree-sitter` WASM binding 可在 Node / 浏览器中使用。
+
+### CST vs AST
+
+| 特性 | CST (Concrete Syntax Tree) | AST (Abstract Syntax Tree) |
+|------|---------------------------|---------------------------|
+| 保留内容 | 所有 token（括号、逗号、空白） | 仅语义节点 |
+| 用途 | 精确代码转换、格式化、高亮 | 编译、静态分析 |
+| 代表工具 | Tree-sitter | TypeScript Compiler API、Babel |
+| 增量更新 | ✅ 只重解析修改部分 | ❌ 通常全量重解析 |
+
+**跨语言类比**: Python `ast` 模块产出 AST；Rust `syn` 产出 AST；C++ Clang 有完整的 CST（`-ast-dump`）。Tree-sitter 的优势在于**语言无关** + **增量解析**。
+
+### 6.1 基础：解析与遍历
 
 ```typescript
 import Parser from "web-tree-sitter";
@@ -262,6 +275,59 @@ const fns = await parseAndExtractFunctions(`
 `);
 // => ["greet", "add"]
 ```
+
+### 6.2 S-expression Query 语言
+
+Tree-sitter 提供类似 CSS 选择器的 **S-expression query**，无需手动递归遍历：
+
+```typescript
+// Query: find all exported function names and their parameter lists
+const query = Lang.query(`
+  (export_statement
+    declaration: (function_declaration
+      name: (identifier) @func_name
+      parameters: (formal_parameters) @params))
+`);
+
+const matches = query.matches(tree.rootNode);
+for (const match of matches) {
+  const name = match.captures.find((c) => c.name === "func_name")!;
+  const params = match.captures.find((c) => c.name === "params")!;
+  console.log(`${name.node.text}${params.node.text}`);
+}
+// For: export function greet(name: string) { ... }
+// Output: "greet(name: string)"
+```
+
+**Query 语法要点**：
+- `(node_type)` — 匹配节点类型
+- `@name` — 捕获节点，命名为 `name`
+- `field: (...)` — 匹配特定 field（如 `name:`、`parameters:`）
+- `(node_type (child_type) @cap)` — 嵌套匹配
+
+### 6.3 增量解析
+
+编辑器场景下，Tree-sitter 只重解析修改区域，其余节点复用：
+
+```typescript
+// Initial parse
+let tree = parser.parse(sourceCode);
+
+// User edits line 5, col 10-15
+tree.edit({
+  startIndex: editStart,
+  oldEndIndex: editOldEnd,
+  newEndIndex: editNewEnd,
+  startPosition: { row: 4, column: 10 },
+  oldEndPosition: { row: 4, column: 15 },
+  newEndPosition: { row: 4, column: 18 },
+});
+
+// Re-parse reuses unchanged nodes — O(log n) for small edits
+tree = parser.parse(newSourceCode, tree);
+```
+
+**实际应用场景**: IDE 语法高亮、代码折叠、symbol outline、自动 rename、lint 规则
 
 ---
 

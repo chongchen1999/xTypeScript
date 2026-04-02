@@ -98,12 +98,12 @@ XX-模块名/
 | [02-typescript-core](02-typescript-core/) | ✅ | 3 files | 6 files |
 | [03-typescript-advanced](03-typescript-advanced/) | ✅ | 3 files | 6 files |
 | [04-async-programming](04-async-programming/) | ✅ | 3 files | 6 files |
-| [05-runtime-and-ecosystem](05-runtime-and-ecosystem/) | ✅ | 3 files | — |
+| [05-runtime-and-ecosystem](05-runtime-and-ecosystem/) | ✅ | 3 files | 6 files |
 | [06-effect-framework](06-effect-framework/) | ✅ | 3 files | 6 files |
-| [07a-schema-and-data](07a-schema-and-data/) | ✅ | — | — |
-| [07b-server-and-cli](07b-server-and-cli/) | ✅ | 3 files | — |
-| [07c-frontend-and-ui](07c-frontend-and-ui/) | ✅ | — | — |
-| [07d-testing-and-tooling](07d-testing-and-tooling/) | ✅ | — | — |
+| [07a-schema-and-data](07a-schema-and-data/) | ✅ | — | 6 files |
+| [07b-server-and-cli](07b-server-and-cli/) | ✅ | 3 files | 6 files |
+| [07c-frontend-and-ui](07c-frontend-and-ui/) | ✅ | — | 6 files |
+| [07d-testing-and-tooling](07d-testing-and-tooling/) | ✅ | — | 6 files |
 
 ### projects/ — 综合项目
 
@@ -125,9 +125,9 @@ XX-模块名/
 2. `02-typescript-core/` — 阅读 notes → 跑 examples → 做 exercises
 3. `03-typescript-advanced/` — 阅读 notes → 做 exercises（类型体操重点）
 4. `04-async-programming/` — 阅读 notes → 跑 examples → 做 exercises
-5. `05-runtime-and-ecosystem/` — 阅读 notes → 跑 examples
+5. `05-runtime-and-ecosystem/` — 阅读 notes → 跑 examples → 做 exercises
 6. **实战**：完成 `projects/01-cli-todo`
 7. `06-effect-framework/` — 阅读 notes → 跑 examples → 做 exercises
 8. **实战**：完成 `projects/02-effect-api`
-9. `07a–07d` — 阅读 notes → 跑 `07b/examples`
+9. `07a–07d` — 阅读 notes → 跑 `07b/examples` → 做 exercises
 10. **实战**：完成 `projects/03-fullstack-app`
