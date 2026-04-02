@@ -142,6 +142,38 @@ app.get("/users/:id", async (c) => {
 });
 ```
 
+### 1.5 全局错误处理 (Global Error Handling)
+
+Hono 的 `onError` 和 `notFound` 处理全局异常和 404：
+
+```typescript
+const app = new Hono();
+
+// 404 handler
+app.notFound((c) => c.json({ error: "Not found", path: c.req.path }, 404));
+
+// Global error boundary — catches unhandled throws in handlers
+app.onError((err, c) => {
+  console.error(`[${c.req.method}] ${c.req.path}:`, err);
+
+  if (err instanceof HTTPException) {
+    return c.json({ error: err.message }, err.status);
+  }
+
+  return c.json({ error: "Internal server error" }, 500);
+});
+
+// HTTPException for structured errors
+import { HTTPException } from "hono/http-exception";
+
+app.get("/protected", (c) => {
+  if (!c.req.header("Authorization")) {
+    throw new HTTPException(401, { message: "Auth required" });
+  }
+  return c.json({ data: "secret" });
+});
+```
+
 ---
 
 ## 2. Yargs: CLI 框架
@@ -299,6 +331,60 @@ await client.connect(new StdioClientTransport({ command: "npx", args: ["file-too
 const { tools } = await client.listTools();
 const result = await client.callTool({ name: "read_file", arguments: { path: "/tmp/test.txt" } });
 ```
+
+### 4.2 资源与提示模板 (Resources & Prompts)
+
+除 Tools 外，MCP Server 还可暴露 **Resources**（只读数据源）和 **Prompts**（预定义提示模板）：
+
+```typescript
+// Resource: expose structured data that LLM can read
+server.resource(
+  "config",
+  "config://app",
+  async (uri) => ({
+    contents: [{
+      uri: uri.href,
+      mimeType: "application/json",
+      text: JSON.stringify(await loadConfig()),
+    }],
+  }),
+);
+
+// Resource template: dynamic URIs with parameters
+server.resource(
+  "user-profile",
+  new ResourceTemplate("users://{userId}/profile", { list: undefined }),
+  async (uri, { userId }) => ({
+    contents: [{
+      uri: uri.href,
+      mimeType: "application/json",
+      text: JSON.stringify(await getUser(userId)),
+    }],
+  }),
+);
+
+// Prompt: reusable prompt templates with arguments
+server.prompt(
+  "code-review",
+  "Review code for quality and best practices",
+  [{ name: "language", description: "Programming language", required: true }],
+  ({ language }) => ({
+    messages: [{
+      role: "user",
+      content: {
+        type: "text",
+        text: `Review the following ${language} code for:\n1. Type safety\n2. Error handling\n3. Performance\n`,
+      },
+    }],
+  }),
+);
+```
+
+| 原语 | 方向 | 用途 | 触发方 |
+|------|------|------|--------|
+| **Tool** | Client → Server | 执行操作（有副作用） | LLM 决定调用 |
+| **Resource** | Client ← Server | 读取数据（只读） | 用户/应用选择 |
+| **Prompt** | Client ← Server | 预置提示模板 | 用户选择 |
 
 ---
 

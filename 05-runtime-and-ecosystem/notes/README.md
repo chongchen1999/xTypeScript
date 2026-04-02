@@ -93,6 +93,48 @@ export type { ButtonProps, InputProps } from "./types.ts";
 - **Python import**: 运行时执行（类似 `require`），无 tree-shaking
 - **Rust `mod`/`use`**: 静态分析，天然 dead code elimination
 
+### ⚠️ ESM 文件扩展名与双包风险 (File Extensions & Dual Package Hazard)
+
+Node.js 通过 `package.json` 的 `"type"` 字段决定 `.js` 文件的解析方式。显式扩展名 `.mjs`（ESM）和 `.cjs`（CJS）可覆盖此设置。
+
+```jsonc
+// "type": "module"  → .js = ESM, .cjs = CJS
+// "type": "commonjs" → .js = CJS, .mjs = ESM (default if omitted)
+```
+
+**双包风险 (Dual Package Hazard)**: 同一个包在同一进程中被 `require()` 和 `import` 各加载一次，导致两份独立实例（不同的 `instanceof`、不同的全局状态）。
+
+```jsonc
+// package.json — conditional exports 同时支持 CJS 和 ESM
+{
+  "exports": {
+    ".": {
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.cjs"
+    }
+  }
+}
+// ⚠️ If a CJS consumer requires this, and an ESM consumer imports it
+// in the same process, two separate module instances exist!
+```
+
+**解决方案**: 优先 ESM-only（Bun 项目推荐）；如必须双格式，确保无全局可变状态，或使用 wrapper pattern 让 CJS 入口委托给 ESM。
+
+### bun.lock — 确定性依赖
+
+Bun 使用二进制格式的 `bun.lock`（v1.2+ 默认 JSONC 文本格式），记录精确版本和 integrity hash。
+
+```bash
+bun install         # Reads bun.lock, installs exact versions
+bun install --frozen-lockfile  # CI: fail if lockfile would change
+```
+
+| 特性 | bun.lock | npm package-lock.json | yarn.lock |
+|------|----------|----------------------|-----------|
+| 格式 | JSONC (v1.2+) / binary | JSON | YAML-like |
+| 速度 | 极快（binary parse） | 中等 | 中等 |
+| 生成 | `bun install` | `npm install` | `yarn install` |
+
 ---
 
 ## 3. 包管理 (Package Management)

@@ -308,6 +308,36 @@ type HttpMethod = "GET" | "POST" | "PUT" | "DELETE";
 type LogLevel = "debug" | "info" | "warn" | "error";
 ```
 
+### satisfies 操作符 (TS 4.9+)
+
+`satisfies` 在验证表达式匹配某类型的同时**保留更窄的推导类型**。解决了 `as const` 丢失类型检查和注解丢失字面量类型两个问题。
+
+```typescript
+type ColorConfig = Record<string, string | { r: number; g: number; b: number }>;
+
+// Without satisfies: type is widened to ColorConfig, lose specific keys
+const colors1: ColorConfig = { primary: "#fff", accent: { r: 255, g: 0, b: 0 } };
+colors1.primary.toUpperCase(); // Error — string | {r,g,b} has no toUpperCase
+
+// With satisfies: validated against ColorConfig, but retains narrow literal types
+const colors2 = {
+  primary: "#fff",
+  accent: { r: 255, g: 0, b: 0 },
+} satisfies ColorConfig;
+colors2.primary.toUpperCase(); // OK — TS knows it's string
+colors2.accent.r;              // OK — TS knows it's { r, g, b }
+
+// Common pattern: config objects
+const routes = {
+  home: "/",
+  user: "/users/:id",
+  admin: "/admin",
+} satisfies Record<string, string>;
+// type is { home: "/"; user: "/users/:id"; admin: "/admin" } — not Record<string, string>
+```
+
+**何时使用**: 需要类型检查但不想丢失推导精度时——替代 `const x: Type = ...` 或 `as const`。
+
 ### Template Literal Types 简介（详见 Stage 03）
 
 ```typescript
@@ -346,6 +376,7 @@ type Handler = `on${Capitalize<EventName>}`; // "onClick" | "onScroll"
 - [ ] 能使用并组合 utility types（Partial, Pick, Omit, Record 等）
 - [ ] 能实现自定义 type guards（`is` 和 `asserts`）
 - [ ] 理解 discriminated union 的基本原理
+- [ ] 能使用 `satisfies` 保留窄类型的同时进行类型检查
 - [ ] 了解 enum、const enum 和 string literal union 的取舍
 
 ---

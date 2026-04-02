@@ -105,6 +105,47 @@ getUser(userId);     // OK
 // getUser(postId);  // Compile error — brand has zero runtime overhead
 ```
 
+### 1.5 高级模式 (Advanced Patterns)
+
+**`.pipe()`** — 串联多个 schema 转换（TS 4.1+），前一步的输出是后一步的输入：
+
+```typescript
+// String → Number → constrained Number
+const PortSchema = z.string()
+  .pipe(z.coerce.number())
+  .pipe(z.number().int().min(1).max(65535));
+
+PortSchema.parse("8080");   // 8080
+PortSchema.parse("99999");  // ZodError: Number must be at most 65535
+```
+
+**`.passthrough()` / `.strip()`** — 控制多余属性：
+
+```typescript
+const StrictUser = z.object({ name: z.string() });
+StrictUser.parse({ name: "Alice", extra: true }); // { name: "Alice" } (extra stripped by default)
+
+const LooseUser = StrictUser.passthrough();
+LooseUser.parse({ name: "Alice", extra: true }); // { name: "Alice", extra: true }
+
+// .strict() — reject unknown keys (throws on extra)
+const VeryStrict = StrictUser.strict();
+VeryStrict.parse({ name: "Alice", extra: true }); // ZodError
+```
+
+**Coercion** — 自动类型转换，常用于处理 query string / form data：
+
+```typescript
+const QuerySchema = z.object({
+  page: z.coerce.number().int().min(1).default(1),
+  limit: z.coerce.number().int().min(1).max(100).default(20),
+  active: z.coerce.boolean(),                      // "true"/"1" → true
+  since: z.coerce.date(),                           // ISO string → Date
+});
+QuerySchema.parse({ page: "2", limit: "50", active: "true", since: "2024-01-01" });
+// { page: 2, limit: 50, active: true, since: Date }
+```
+
 ---
 
 ## 二、Drizzle ORM: 类型安全的数据库操作
@@ -185,6 +226,59 @@ export default defineConfig({
   dialect: "sqlite", dbCredentials: { url: "./data/app.db" },
 });
 ```
+
+### 2.4 高级查询 (Advanced Queries)
+
+```typescript
+import { eq, sql, desc, and, gt } from "drizzle-orm";
+
+// Subquery
+const activeAuthors = db
+  .select({ authorId: schema.posts.authorId })
+  .from(schema.posts)
+  .where(eq(schema.posts.published, true))
+  .groupBy(schema.posts.authorId);
+
+// Raw SQL for complex expressions
+const recentUsers = await db
+  .select({
+    name: schema.users.name,
+    postCount: sql<number>`(SELECT COUNT(*) FROM posts WHERE posts.author_id = ${schema.users.id})`,
+  })
+  .from(schema.users)
+  .where(gt(schema.users.createdAt, sql`datetime('now', '-7 days')`))
+  .orderBy(desc(schema.users.createdAt));
+
+// Batch insert with conflict handling
+await db.insert(schema.users)
+  .values(newUsers)
+  .onConflictDoUpdate({
+    target: schema.users.email,
+    set: { name: sql`excluded.name` },
+  });
+```
+
+### 2.5 迁移冲突处理 (Migration Conflict Resolution)
+
+多人协作时 migration 文件可能冲突。处理策略：
+
+```bash
+# Situation: two developers both generated migrations from the same base
+# Developer A: 0001_add_avatar.sql
+# Developer B: 0001_add_bio.sql
+
+# Fix: regenerate from current schema state
+npx drizzle-kit generate   # Produces 0002_xxx.sql incorporating both changes
+
+# If push fails (schema mismatch):
+npx drizzle-kit push --force  # Dev only — drops and recreates (DATA LOSS)
+
+# Production: never use --force, always review generated SQL
+npx drizzle-kit generate   # Check the SQL diff
+npx drizzle-kit migrate    # Apply sequentially
+```
+
+**⚠️ SQLite 限制**: SQLite 不支持 `ALTER TABLE DROP COLUMN`（3.35.0 之前）、无原生 `BOOLEAN`/`TIMESTAMP` 类型（Drizzle 通过 `mode` 选项映射）、`AUTOINCREMENT` 只能用于 `INTEGER PRIMARY KEY`。
 
 ---
 

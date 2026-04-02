@@ -409,6 +409,58 @@ const makeApiClient = Effect.gen(function* () {
 
 ---
 
+## 10. 性能考量 (Performance Considerations)
+
+### Fiber 开销
+
+Effect 的 Fiber 是协作式用户态线程，比 OS 线程轻量得多，但不是零成本：
+- **创建成本**: 每个 `Effect.fork` 创建一个 Fiber 对象 + 栈帧，约数百纳秒
+- **调度**: 基于 microtask，单线程内协作式切换
+- **适用场景**: 数百到数千并发 Fiber 无压力；百万级并发考虑用 Stream 或 batch
+
+```typescript
+// ✅ Good: bounded concurrency
+const results = yield* Effect.forEach(items, processItem, { concurrency: 20 });
+
+// ⚠️ Caution: unbounded fork for large collections
+// Each fork creates a Fiber — 1M items = 1M Fibers in memory
+const fibers = yield* Effect.forEach(
+  hugeList,
+  (item) => Effect.fork(processItem(item)),
+  { concurrency: "unbounded" }, // prefer a bounded number
+);
+```
+
+### Layer 实例化
+
+Layer 默认 **memoized** —— 同一个 Layer 引用在一次 `Effect.provide` 中只实例化一次，结果被共享。
+
+```typescript
+// DatabaseLive is constructed ONCE even if used by multiple services
+const AppLive = Layer.merge(
+  UserRepoLive,   // depends on DatabaseLive
+  PostRepoLive,   // also depends on DatabaseLive
+).pipe(Layer.provide(DatabaseLive)); // DatabaseLive built once, shared
+
+// ⚠️ Layer.fresh() forces re-instantiation (rare — only for test isolation)
+const freshDb = Layer.fresh(DatabaseLive);
+```
+
+**Layer 构建时机**: `Effect.provide(layer)` 在首次 `runPromise` 时触发构建，按依赖图拓扑排序执行。构建过程本身也是 Effect，可以失败——确保 Layer 构建中的错误有合理的处理。
+
+### 与原生 async/await 的对比
+
+| 场景 | Effect | 原生 async/await |
+|------|--------|-----------------|
+| 简单 CRUD handler | 微量开销（< 1ms） | 最快 |
+| 错误类型追踪 | 编译时保证 | 无保证 |
+| 依赖注入 | 零反射，编译时安全 | 需要 DI 框架 |
+| 复杂并发/重试 | 声明式组合 | 手写大量模板代码 |
+
+**经验法则**: 如果你的代码已经有 try/catch + retry + DI + logging，Effect 不会更慢——它把分散在各处的复杂度统一管理。
+
+---
+
 ## 推荐资源
 
 | 资源 | 说明 |

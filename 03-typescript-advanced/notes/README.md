@@ -322,6 +322,37 @@ type Flat = DeepFlatten<number[][][]>;  // number
 
 ---
 
+## 9. const 类型参数 (const Type Parameters — TS 5.0+)
+
+泛型函数前加 `const` 修饰符，令 TS 自动推断为 **最窄的字面量类型**——无需调用方写 `as const`。
+
+```typescript
+// Without const: T inferred as string[]
+function getRoutes<T extends readonly string[]>(routes: T): T { return routes; }
+const r1 = getRoutes(["home", "about"]);  // string[]
+
+// With const: T inferred as readonly ["home", "about"]
+function getRoutesConst<const T extends readonly string[]>(routes: T): T { return routes; }
+const r2 = getRoutesConst(["home", "about"]);  // readonly ["home", "about"]
+
+// Practical: type-safe config builder
+function defineConfig<const T extends { name: string; features: readonly string[] }>(config: T): T {
+  return config;
+}
+const cfg = defineConfig({ name: "app", features: ["auth", "i18n"] });
+// typeof cfg = { name: "app"; features: readonly ["auth", "i18n"] }
+// Without const: { name: string; features: string[] }
+
+// Works with objects too — deep literal inference
+function createEnum<const T extends Record<string, number>>(obj: T): T { return obj; }
+const Status = createEnum({ Active: 1, Inactive: 0 });
+// typeof Status = { Active: 1; Inactive: 0 } — not { Active: number; Inactive: number }
+```
+
+**何时使用**: 库 API 需要保留调用方传入的字面量类型时——路由定义、配置对象、枚举构造器。
+
+---
+
 ## 推荐资源
 
 | 资源 | 说明 |

@@ -134,6 +134,56 @@ const Bad: Component<{ name: string }> = ({ name }) => <p>{name}</p>;
 const Good: Component<{ name: string }> = (props) => <p>{props.name}</p>;
 ```
 
+### 1.5 生命周期与清理 (Lifecycle & Cleanup)
+
+Solid 没有 React 式的 re-render lifecycle，但提供 `onMount`、`onCleanup` 和 effect 清理：
+
+```tsx
+import { createSignal, createEffect, onMount, onCleanup } from "solid-js";
+
+function WebSocketChat(props: { url: string }) {
+  const [messages, setMessages] = createSignal<string[]>([]);
+
+  // onMount: runs once after initial render (like useEffect(fn, []) in React)
+  onMount(() => console.log("Component mounted"));
+
+  // createEffect with cleanup: returned function runs before next effect or on dispose
+  createEffect(() => {
+    const ws = new WebSocket(props.url); // tracks props.url reactively
+    ws.onmessage = (e) => setMessages((prev) => [...prev, e.data]);
+    onCleanup(() => ws.close()); // runs when props.url changes or component unmounts
+  });
+
+  return <For each={messages()}>{(msg) => <p>{msg}</p>}</For>;
+}
+```
+
+**关键区别**: React 的 `useEffect` cleanup 在每次 re-render 时调用；Solid 的 `onCleanup` 在 reactive scope 重新执行或组件卸载时调用。
+
+### 1.6 Suspense 与 ErrorBoundary
+
+```tsx
+import { Suspense, ErrorBoundary, createResource } from "solid-js";
+
+function App() {
+  return (
+    <ErrorBoundary fallback={(err) => <div>Error: {err.message}</div>}>
+      <Suspense fallback={<div>Loading...</div>}>
+        <UserProfile userId="1" />
+      </Suspense>
+    </ErrorBoundary>
+  );
+}
+
+function UserProfile(props: { userId: string }) {
+  // createResource auto-integrates with Suspense
+  const [user] = createResource(() => props.userId, fetchUser);
+  return <div>{user()?.name}</div>; // Suspense shows fallback until resolved
+}
+```
+
+`Suspense` 捕获子树中所有 `createResource` 的 pending 状态；`ErrorBoundary` 捕获子树中的渲染和异步错误。两者可嵌套组合。
+
 ---
 
 ## 二、TanStack: 路由与数据查询
@@ -166,6 +216,47 @@ function UserPage() {
 }
 
 const router = createRouter({ routeTree: rootRoute.addChildren([userRoute]) });
+```
+
+### 嵌套布局 (Nested Layouts)
+
+TanStack Router 支持路由嵌套，父路由提供共享布局，子路由渲染到 `<Outlet />` 中：
+
+```tsx
+import { Outlet } from "@tanstack/solid-router";
+
+// Layout route — provides sidebar + header for all /dashboard/* routes
+const dashboardRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "dashboard",
+  component: () => (
+    <div class="flex">
+      <nav class="w-64">
+        <Link to="/dashboard/overview">Overview</Link>
+        <Link to="/dashboard/settings">Settings</Link>
+      </nav>
+      <main class="flex-1">
+        <Outlet />   {/* Child routes render here */}
+      </main>
+    </div>
+  ),
+});
+
+const overviewRoute = createRoute({
+  getParentRoute: () => dashboardRoute,
+  path: "overview",
+  component: () => <h1>Overview</h1>,
+});
+
+const settingsRoute = createRoute({
+  getParentRoute: () => dashboardRoute,
+  path: "settings",
+  component: () => <h1>Settings</h1>,
+});
+
+const routeTree = rootRoute.addChildren([
+  dashboardRoute.addChildren([overviewRoute, settingsRoute]),
+]);
 ```
 
 ### 2.2 TanStack Query — 服务端状态管理
