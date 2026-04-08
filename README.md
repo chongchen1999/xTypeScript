@@ -9,16 +9,17 @@
 ## 学习路线
 
 ```
-Stage 01 → Stage 02 → Stage 03 → Stage 04 → Stage 05
-JS 基础    TS 核心    TS 进阶    异步编程   运行时生态
+Stage 00 → Stage 01 → Stage 02 → Stage 03 → Stage 04 → Stage 05
+TS 基础入门  JS 基础    TS 核心    TS 进阶    异步编程   运行时生态
 
-        → Stage 06 → Stage 07a → Stage 07b → 07c/07d
-          Effect     Schema/数据  Server/CLI  前端/测试
+          → Stage 06 → Stage 07a → Stage 07b → 07c/07d
+            Effect     Schema/数据  Server/CLI  前端/测试
 ```
 
 | 阶段 | 标题                  | 预计时间   | 前置要求            |
 |------|-----------------------|-----------|---------------------|
-| 01   | JavaScript 基础       | 3–5 天    | C++/Python 经验     |
+| 00   | TypeScript 基础入门   | 1–2 天    | C++/Python 经验     |
+| 01   | JavaScript 基础       | 3–5 天    | Stage 00            |
 | 02   | TypeScript 核心       | 3–5 天    | Stage 01            |
 | 03   | TypeScript 高级       | 4–6 天    | Stage 02            |
 | 04   | 异步编程              | 3–4 天    | Stage 01, 02        |
@@ -29,7 +30,7 @@ JS 基础    TS 核心    TS 进阶    异步编程   运行时生态
 | 07c  | 前端与 UI             | 4–5 天    | Stage 02, 04        |
 | 07d  | 测试与工具链          | 2–3 天    | Stage 05            |
 
-**总计：约 33–48 天**
+**总计：约 34–50 天**
 
 ## 快速上手
 
@@ -94,6 +95,7 @@ XX-模块名/
 
 | 模块 | notes | examples | exercises |
 |------|-------|----------|-----------|
+| [00-basics](00-basics/) | ✅ | 4 files | 6 files |
 | [01-javascript-foundations](01-javascript-foundations/) | ✅ | 4 files | 6 files |
 | [02-typescript-core](02-typescript-core/) | ✅ | 3 files | 6 files |
 | [03-typescript-advanced](03-typescript-advanced/) | ✅ | 3 files | 6 files |
@@ -121,13 +123,14 @@ XX-模块名/
 
 ## 推荐学习顺序
 
-1. `01-javascript-foundations/` — 阅读 notes → 跑 examples → 做 exercises
-2. `02-typescript-core/` — 阅读 notes → 跑 examples → 做 exercises
-3. `03-typescript-advanced/` — 阅读 notes → 做 exercises（类型体操重点）
-4. `04-async-programming/` — 阅读 notes → 跑 examples → 做 exercises
-5. `05-runtime-and-ecosystem/` — 阅读 notes → 跑 examples → 做 exercises
-6. **实战**：完成 `projects/01-cli-todo`
-7. `06-effect-framework/` — 阅读 notes → 跑 examples → 做 exercises
-8. **实战**：完成 `projects/02-effect-api`
-9. `07a–07d` — 阅读 notes → 跑 `07b/examples` → 做 exercises
-10. **实战**：完成 `projects/03-fullstack-app`
+1. `00-basics/` — 阅读 notes → 跑 examples → 做 exercises
+2. `01-javascript-foundations/` — 阅读 notes → 跑 examples → 做 exercises
+3. `02-typescript-core/` — 阅读 notes → 跑 examples → 做 exercises
+4. `03-typescript-advanced/` — 阅读 notes → 做 exercises（类型体操重点）
+5. `04-async-programming/` — 阅读 notes → 跑 examples → 做 exercises
+6. `05-runtime-and-ecosystem/` — 阅读 notes → 跑 examples → 做 exercises
+7. **实战**：完成 `projects/01-cli-todo`
+8. `06-effect-framework/` — 阅读 notes → 跑 examples → 做 exercises
+9. **实战**：完成 `projects/02-effect-api`
+10. `07a–07d` — 阅读 notes → 跑 `07b/examples` → 做 exercises
+11. **实战**：完成 `projects/03-fullstack-app`
