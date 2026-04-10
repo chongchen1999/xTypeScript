@@ -4,6 +4,7 @@
  */
 
 // --- 1. Basic type annotations ---
+console.log("\n1. Basic type annotations ---")
 const count: number = 42;
 const pi: number = 3.14159;
 const hex: number = 0xff;
@@ -28,6 +29,7 @@ let inferredBool = true;    // boolean
 // inferred = "oops"; // Error: Type 'string' is not assignable to type 'number'
 
 // --- 3. null and undefined ---
+console.log("\n--- 3. null and undefined ---")
 let n: null = null;
 let u: undefined = undefined;
 
@@ -52,6 +54,7 @@ console.log(zero || 3000); // 3000 (wrong if 0 is valid!)
 console.log(zero ?? 3000); // 0    (correct)
 
 // --- 4. bigint — arbitrary precision integers ---
+console.log("\n--- 4. bigint — arbitrary precision integers ---")
 const big: bigint = 9007199254740993n; // beyond Number.MAX_SAFE_INTEGER
 console.log(big + 1n); // 9007199254740994n
 // console.log(big + 1); // Error: cannot mix bigint and number

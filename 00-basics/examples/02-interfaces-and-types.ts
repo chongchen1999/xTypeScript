@@ -19,6 +19,7 @@ const alice: User = {
   createdAt: new Date(),
 };
 console.log(alice.name, alice.age); // "Alice" undefined
+console.log("alice is:\n", alice)
 
 // alice.createdAt = new Date(); // Error: Cannot assign to 'createdAt'
 
@@ -42,10 +43,10 @@ type Status = "active" | "inactive" | "banned";
 type Pair<T> = [T, T];
 
 const userId: ID = "user-123";
-const status: Status = "active";
+const status_: Status = "active";
 const coords: Pair<number> = [10, 20];
 
-console.log(userId, status, coords);
+console.log(userId, status_, coords);
 
 // --- 4. interface extends — composition ---
 interface Timestamped {
@@ -77,7 +78,7 @@ const entity: Entity = {
   createdAt: new Date(),
   updatedAt: new Date(),
 };
-console.log(entity.id, entity.name);
+console.log("entity is: ", entity);
 
 // --- 6. Function types ---
 type MathOp = (a: number, b: number) => number;
